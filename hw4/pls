@@ -1,0 +1,90 @@
+#! /bin/bash
+
+program=$(echo $0 | cut -d"/" -f2)
+
+if [[ $# -ne 1 ]]
+then
+	echo "usage: $program <directory>"
+	exit 1
+fi
+
+if [[ ! (-e $1) ]]
+then
+	echo "$program: not found: $1"
+	exit 1
+fi
+
+if [[ ! (-d $1) ]]
+then
+	echo "$program: $1 is not a directory"
+	exit 1
+fi
+
+home=$(pwd)
+cd $1
+
+let numDir=0
+let numFile=0
+
+for item in *
+do
+	if [[ -d $item ]]
+	then
+		echo -n "$item"
+		if [[ -x $item ]]
+		then
+			echo -n "* "
+		else
+			echo -n "  "
+		fi
+		if [[ -s $item ]]
+		then
+			size=$(ls -dl $item | cut -d" " -f5)
+			if [[ $size -ge 1000000 ]]
+			then
+				size=${size:0:-6}
+				echo "$size MB"
+			elif [[ $size -ge 1000 ]]
+			then
+				size=${size:0:-3}
+				echo "$size kB"
+			else
+				echo "$size bytes"
+			fi
+		else
+			echo "empty"
+		fi
+		let numDir="(numDir+1)"
+	else	
+		echo -n "$item"
+		if [[ -x $item ]]
+		then
+			echo -n "* "
+		else
+			echo -n "  "
+		fi
+		if [[ -s $item ]]
+		then
+			size=$(wc -c <$item)
+			if [[ $size -ge 1000000 ]]
+			then
+				size=${size:0:-6}
+				echo "$size MB"
+			elif [[ $size -ge 1000 ]]
+			then
+				size=${size:0:-3}
+				echo "$size kB"
+			else
+				echo "$size bytes"
+			fi
+		else
+			echo "empty"
+		fi
+		let numFile="(numFile+1)"
+	fi
+
+done
+
+echo "$numFile files, $numDir dirs"
+
+cd $home

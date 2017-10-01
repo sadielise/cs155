@@ -1,0 +1,15 @@
+#! /bin/bash
+
+for item in *
+do
+	cp $item $item.backup
+	if [[ -x $item ]]
+	then
+		echo "$item hi"
+	elif [[ -r $item ]]
+	then
+		echo "$item bye"
+	else
+		echo "heyo"
+	fi
+done
